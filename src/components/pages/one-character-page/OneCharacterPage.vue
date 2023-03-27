@@ -50,8 +50,12 @@ export default {
   },
   methods: {
     async getCharacter(id) {
-      const character = await axios.get(GET_CHARACTERS + "/" + id);
-      this.character = character.data;
+      try {
+        const character = await axios.get(GET_CHARACTERS + "/" + id);
+        this.character = character.data;
+      } catch (e) {
+        this.navigate();
+      }
     },
     navigate() {
       this.$router.push({ name: "characters" });

@@ -17,6 +17,10 @@ const routes = [
     name: "character",
     component: OneCharacterPage,
   },
+  {
+    path: "/:catchAll(.*)",
+    redirect: { name: "characters" },
+  },
 ];
 
 const router = createRouter({
