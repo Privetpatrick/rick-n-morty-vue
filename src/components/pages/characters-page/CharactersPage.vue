@@ -5,7 +5,7 @@
       <form>
         <div class="search-icon"></div>
         <input
-          @input="getCharactersByInput"
+          @input="fetchCharacters(inputValue)"
           v-model.trim="inputValue"
           class="search"
           type="text"
@@ -28,13 +28,12 @@
 </template>
 
 <script>
-import axios from "axios";
 import CharacterCard from "./CharacterCard.vue";
+import { mapActions } from "vuex";
 import {
-  GET_CHARACTERS,
-  GET_CHARACTERS_BY_NAME,
-  LOCAL_STORAGE,
-} from "../../../shared/constants";
+  getLocalStorage,
+  setLocalStorage,
+} from "../../../services/localStorage.service";
 
 export default {
   components: {
@@ -42,51 +41,28 @@ export default {
   },
   data() {
     return {
-      characters: [],
       inputValue: "",
     };
   },
-  methods: {
-    async getCharacters(input) {
-      try {
-        if (input) {
-          const characters = await axios.get(GET_CHARACTERS_BY_NAME + input);
-          this.characters = characters.data.results.sort((a, b) =>
-            a.name.localeCompare(b.name)
-          );
-        } else {
-          const characters = await axios.get(GET_CHARACTERS);
-          this.characters = characters.data.results.sort((a, b) =>
-            a.name.localeCompare(b.name)
-          );
-        }
-      } catch (e) {
-        this.characters = [];
-      }
-    },
-    getCharactersByInput() {
-      this.getCharacters(this.inputValue);
-    },
-    getLocalStorage() {
-      const value = localStorage.getItem(LOCAL_STORAGE);
-      if (!value) return "";
-      return value;
-    },
-    setLocalStorage(inputValue) {
-      localStorage.setItem(LOCAL_STORAGE, inputValue);
+  computed: {
+    characters() {
+      return this.$store.getters.getCharacters;
     },
   },
+  methods: {
+    ...mapActions(["fetchCharacters"]),
+  },
   mounted() {
-    const inputValue = this.getLocalStorage();
+    const inputValue = getLocalStorage();
     if (inputValue) {
       this.inputValue = inputValue;
-      this.getCharacters(this.inputValue);
+      this.fetchCharacters(inputValue);
     } else {
-      this.getCharacters();
+      this.fetchCharacters(inputValue);
     }
   },
   beforeUnmount() {
-    if (this.inputValue) this.setLocalStorage(this.inputValue);
+    setLocalStorage(this.inputValue);
   },
 };
 </script>

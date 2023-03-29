@@ -42,33 +42,38 @@
 <script>
 import axios from "axios";
 import { GET_CHARACTERS } from "@/shared/constants";
+
 export default {
   data() {
     return {
       character: null,
     };
   },
+  computed: {
+    characterType() {
+      return this.character.type ? this.character.type : "Unknown";
+    },
+  },
   methods: {
-    async getCharacter(id) {
+    async fetchOneCharacter(id) {
       try {
-        const character = await axios.get(GET_CHARACTERS + "/" + id);
-        this.character = character.data;
+        let character = await axios.get(GET_CHARACTERS + "/" + id);
+        character = character.data;
+        this.character = character;
       } catch (e) {
-        this.navigate();
+        this.$router.push({ name: "characters" });
       }
     },
     navigate() {
       this.$router.push({ name: "characters" });
     },
   },
-  computed: {
-    characterType() {
-      return this.character.type ? this.character.type : "Unknown";
-    },
-  },
   mounted() {
     const id = this.$route.params.id;
-    this.getCharacter(id);
+    const characters = this.$store.getters.getCharacters;
+    const character = characters.find((char) => char.id === +id);
+    if (character) return (this.character = character);
+    this.fetchOneCharacter(id);
   },
 };
 </script>
