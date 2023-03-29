@@ -5,7 +5,6 @@ export const charactersModule = {
   state() {
     return {
       characters: [],
-      character: null,
     };
   },
   getters: {
